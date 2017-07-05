@@ -7,14 +7,18 @@ from termcolor import colored
 
 parser = argparse.ArgumentParser(description='Summarize reading list data.')
 parser.add_argument('-a', '--author', help='Highlight books by author.')
+parser.add_argument('-u', '--until_year', help='Summarize each year until yyyy inclusive.')
+parser.add_argument('-f', '--from_year', help='Summarize each year from yyyy inclusive.')
+parser.add_argument('-s', '--stats', action="store_true", help='Adds summary stats at the end of the listing.')
 args = parser.parse_args()
+
 
 reading_list = expanduser("~") + "/Documents/reading-list/reading.md"
 f=open(reading_list, 'r')
 content = f.readlines()
 prev_year = year_string = ""
 total_books = total_pages = book_count = page_count = 0
-year_count = 1
+year_count = 0
 dict = {}
 for line in content:
     matchObj = re.match(r'^1.\s(.*)\s(edited by|by)\s(.*);\s(.*)\s\((.*)\)</br>', line, re.M|re.I)
@@ -57,8 +61,14 @@ for line in content:
         #print "-----"
 
         if current_year != prev_year:
+            if args.from_year:
+                if current_year < args.from_year:
+                    continue
+            if args.until_year:
+                if current_year > args.until_year:
+                    break
             #print len(year_string)
-            if year_count != 1:
+            if year_count != 0:
                 print('{:<65} {:>4} {:>6}'.format(year_string, str(book_count), str(page_count)))
             else:
                 print('{:<65} {:>4} {:>5}'.format('Year', 'Books', 'Pages'))
@@ -103,12 +113,19 @@ for line in content:
 
 f.close()
 # Final year goes here
-if year_count != 1:
+if year_count != 0:
     print('{:<65} {:>4} {:>6}'.format(year_string, str(book_count), str(page_count)))
 else:
     print('{:<65} {:>4} {:>5}'.format('Year', 'Books', 'Pages'))
 year_string = current_year + " "
-book_count = page_count = 0
 prev_year = current_year
-year_count = year_count +1
 print('{:<65} {:>4} {:>6}'.format('Total', total_books, total_pages))
+
+if args.stats:
+    print ""
+    print "Statistical Summary"
+    print "==================="
+    print "Years:", year_count
+    print "Avg books/year:", str(total_books/year_count)
+    print "Avg pages/year:", str(total_pages/year_count)
+    print "Avg pages/book:", str(total_pages/total_books)
