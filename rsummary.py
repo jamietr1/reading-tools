@@ -17,12 +17,20 @@ def FormatGraph(year_string, book_count, page_count):
     output = output + str(page_count)
     return output
 
+def FormatLegend():
+    output = "LEGEND: # = Paper   " + colored('+ = Ebook', 'blue', attrs=['bold']) + "   " + colored('@ = Audiobook', 'yellow')
+    if args.author:
+        output = output + "   " + colored('Red = ', 'red', attrs=['bold']) + args.author
+    return output
+
 parser = argparse.ArgumentParser(description='Summarize reading list data.')
 parser.add_argument('-a', '--author', help='Highlight books by author.')
 parser.add_argument('-f', '--from_year', help='Summarize each year from yyyy inclusive.')
 parser.add_argument('-g', '--graph', action="store_true", help='Produces a graph for each year.')
-parser.add_argument('-u', '--until_year', help='Summarize each year until yyyy inclusive.')
+parser.add_argument('-H', '--highlight', action="store_true", help='Highlights books by type.')
+parser.add_argument('-l', '--legend', action="store_true", help='Displays a legend with the graph.')
 parser.add_argument('-s', '--stats', action="store_true", help='Adds summary stats at the end of the listing.')
+parser.add_argument('-u', '--until_year', help='Summarize each year until yyyy inclusive.')
 args = parser.parse_args()
 
 
@@ -83,17 +91,22 @@ for line in content:
 
         if book_type == "Paper":
             type_string = "#"
-            #year_string = year_string + "#"
         elif book_type == "Audiobook":
-            type_string = "@"
+            if args.highlight:
+                type_string = colored('@', 'yellow')
+            else:
+                type_string = "@"
             #year_string = year_string + "@"
         elif book_type == "Ebook":
-            type_string = "+"
+            if args.highlight:
+                type_string = colored('+', 'blue', attrs=['bold'])
+            else:
+                type_string = "+"
             #year_string = year_string + "+"
 
         if args.author:
             if author == args.author:
-                year_string = year_string + colored(type_string, 'red')
+                year_string = year_string + colored(type_string, 'red', attrs=['bold'])
             else:
                 year_string = year_string + type_string
         else:
@@ -122,6 +135,10 @@ elif year_count == 0 and args.graph:
 year_string = current_year + " "
 prev_year = current_year
 print('{:<65} {:>4} {:>6}'.format('Total', total_books, total_pages))
+
+if args.legend:
+    print ""
+    print FormatLegend()
 
 if args.stats:
     print ""
