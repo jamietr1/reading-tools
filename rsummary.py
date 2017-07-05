@@ -5,10 +5,23 @@ import argparse
 from os.path import expanduser
 from termcolor import colored
 
+def FormatGraph(year_string, book_count, page_count):
+    output = year_string
+    padding = 65 - (book_count + 5)
+    output = output + " " * padding
+    padding = 5 - len(str(book_count))
+    output = output + " " * padding
+    output = output + str(book_count)
+    padding = 7 - len(str(page_count))
+    output = output + " " * padding
+    output = output + str(page_count)
+    return output
+
 parser = argparse.ArgumentParser(description='Summarize reading list data.')
 parser.add_argument('-a', '--author', help='Highlight books by author.')
-parser.add_argument('-u', '--until_year', help='Summarize each year until yyyy inclusive.')
 parser.add_argument('-f', '--from_year', help='Summarize each year from yyyy inclusive.')
+parser.add_argument('-g', '--graph', action="store_true", help='Produces a graph for each year.')
+parser.add_argument('-u', '--until_year', help='Summarize each year until yyyy inclusive.')
 parser.add_argument('-s', '--stats', action="store_true", help='Adds summary stats at the end of the listing.')
 args = parser.parse_args()
 
@@ -51,15 +64,6 @@ for line in content:
 
         current_year = date[-4:]
 
-        #print "Title: ", title_string
-        #print "Author: ", author
-        #print "Pages: ", pages
-        #print "Date: ", date
-        #print "Year: ", current_year
-        #print "Book type: ", book_type
-        #print "Recommended: ", recommended
-        #print "-----"
-
         if current_year != prev_year:
             if args.from_year:
                 if current_year < args.from_year:
@@ -68,9 +72,9 @@ for line in content:
                 if current_year > args.until_year:
                     break
             #print len(year_string)
-            if year_count != 0:
-                print('{:<65} {:>4} {:>6}'.format(year_string, str(book_count), str(page_count)))
-            else:
+            if year_count != 0 and args.graph:
+                print FormatGraph(year_string, book_count, page_count)
+            elif year_count == 0 and args.graph:
                 print('{:<65} {:>4} {:>5}'.format('Year', 'Books', 'Pages'))
             year_string = current_year + " "
             book_count = page_count = 0
@@ -107,15 +111,13 @@ for line in content:
         book_count = book_count +1
         total_books = total_books + 1
         total_pages = total_pages + pc
-
-
-
-
+    else:
+        print line
 f.close()
 # Final year goes here
-if year_count != 0:
-    print('{:<65} {:>4} {:>6}'.format(year_string, str(book_count), str(page_count)))
-else:
+if year_count != 0 and args.graph:
+    print FormatGraph(year_string, book_count, page_count)
+elif year_count == 0 and args.graph:
     print('{:<65} {:>4} {:>5}'.format('Year', 'Books', 'Pages'))
 year_string = current_year + " "
 prev_year = current_year
