@@ -1,7 +1,13 @@
 #!/usr/bin/env python
 
 import re
+import argparse
 from os.path import expanduser
+from termcolor import colored
+
+parser = argparse.ArgumentParser(description='Summarize reading list data.')
+parser.add_argument('-a', '--author', help='Highlight books by author.')
+args = parser.parse_args()
 
 reading_list = expanduser("~") + "/Documents/reading-list/reading.md"
 f=open(reading_list, 'r')
@@ -51,6 +57,7 @@ for line in content:
         #print "-----"
 
         if current_year != prev_year:
+            #print len(year_string)
             if year_count != 1:
                 print('{:<65} {:>4} {:>6}'.format(year_string, str(book_count), str(page_count)))
             else:
@@ -61,11 +68,22 @@ for line in content:
             year_count = year_count +1
 
         if book_type == "Paper":
-            year_string = year_string + "#"
+            type_string = "#"
+            #year_string = year_string + "#"
         elif book_type == "Audiobook":
-            year_string = year_string + "@"
+            type_string = "@"
+            #year_string = year_string + "@"
         elif book_type == "Ebook":
-            year_string = year_string + "+"
+            type_string = "+"
+            #year_string = year_string + "+"
+
+        if args.author:
+            if author == args.author:
+                year_string = year_string + colored(type_string, 'red')
+            else:
+                year_string = year_string + type_string
+        else:
+            year_string = year_string + type_string
 
         if "/" in pages:
             pp, audio = pages.split('/')
