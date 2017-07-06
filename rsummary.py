@@ -38,7 +38,7 @@ reading_list = expanduser("~") + "/Documents/reading-list/reading.md"
 f=open(reading_list, 'r')
 content = f.readlines()
 prev_year = year_string = ""
-total_books = total_pages = book_count = page_count = 0
+total_paper = total_audio = total_ebook = total_books = total_pages = book_count = page_count = 0
 year_count = 0
 dict = {}
 for line in content:
@@ -91,17 +91,20 @@ for line in content:
 
         if book_type == "Paper":
             type_string = "#"
+            total_paper = total_paper + 1
         elif book_type == "Audiobook":
             if args.highlight:
                 type_string = colored('@', 'yellow')
             else:
                 type_string = "@"
+            total_audio = total_audio + 1
             #year_string = year_string + "@"
         elif book_type == "Ebook":
             if args.highlight:
                 type_string = colored('+', 'blue', attrs=['bold'])
             else:
                 type_string = "+"
+            total_ebook = total_ebook + 1
             #year_string = year_string + "+"
 
         if args.author:
@@ -145,6 +148,10 @@ if args.stats:
     print "Statistical Summary"
     print "==================="
     print "Years:", year_count
+    print "Books:", total_books
+    print "  - Paper:", total_paper
+    print "  - Ebook:", total_ebook
+    print "  - Audio:", total_audio
     print "Avg books/year:", str(total_books/year_count)
     print "Avg pages/year:", str(total_pages/year_count)
     print "Avg pages/book:", str(total_pages/total_books)
