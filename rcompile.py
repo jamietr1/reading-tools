@@ -4,6 +4,7 @@ import re
 import argparse
 import fuzzy
 from os.path import expanduser
+from datetime import datetime
 
 reading_list = expanduser("~") + "/Documents/reading-list/reading.md"
 f=open(reading_list, 'r')
@@ -127,9 +128,15 @@ for line in content:
 
         author = matchObj.group(3)
         pages = matchObj.group(4)
-        date = matchObj.group(5)
 
-        reading_file.append(title_string + '|' + author + '|' + book_type + '|' + pages + '|' + date)
+        pages = pages.replace('p', '')
+        if '/' in pages:
+            pages, time = pages.split('/')
+
+        date = datetime.strptime(matchObj.group(5), "%m/%d/%Y")
+        date = datetime.strftime(date, "%Y-%m-%d")
+
+        reading_file.append(date + '|' + title_string + '|' + author + '|' + book_type + '|' + pages)
 f.close()
 
 # Write reading list index
@@ -137,4 +144,29 @@ list_index = expanduser("~") + "/Scripts/reading-tools/reading.dat"
 reading = open(list_index, 'w')
 for item in reading_file:
     print>>reading, item
+reading.close()
+
+# Sort list by longest reading-tools
+list_index = expanduser("~") + "/Scripts/reading-tools/reading.dat"
+f=open(list_index, 'r')
+content = f.readlines()
+length_list = {}
+
+for line in content:
+    line = line.rstrip()
+    date, title, author, media, pages = line.split('|')
+    pages = int(pages)
+    if pages in length_list.keys():
+        value = length_list[pages]
+        value = value + ';' + date + '|' + title + '|' + author + '|' + media + '|' + str(pages)
+        length_list[pages] = value
+    else:
+        length_list[pages] = date + '|' + title + '|' + author + '|' + media + '|' + str(pages)
+f.close()
+
+# Write reading length index
+list_index = expanduser("~") + "/Scripts/reading-tools/length.dat"
+reading = open(list_index, 'w')
+for key in sorted(length_list.iterkeys(), reverse=True):
+    print>>reading, length_list[key]
 reading.close()
