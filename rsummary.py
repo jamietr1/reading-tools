@@ -4,6 +4,13 @@ import re
 import argparse
 from os.path import expanduser
 from termcolor import colored
+from math import modf
+
+def GetHoursMinsFormat(hours):
+    min_part, hour_part = modf(hours)
+    str_time = str(int(hour_part)) + ':' + str(int(min_part*60))
+    return str_time
+
 
 def FormatGraph(year_string, book_count, page_count):
     output = year_string
@@ -37,8 +44,9 @@ args = parser.parse_args()
 reading_list = expanduser("~") + "/Documents/reading-list/reading.md"
 f=open(reading_list, 'r')
 content = f.readlines()
+stats = stat_line = ""
 prev_year = year_string = ""
-total_paper = total_audio = total_ebook = total_books = total_pages = book_count = page_count = 0
+total_audio_time = audio_time = total_paper = total_audio = total_ebook = total_books = total_pages = book_count = page_count = 0
 year_count = 0
 dict = {}
 for line in content:
@@ -82,8 +90,10 @@ for line in content:
             #print len(year_string)
             if year_count != 0 and args.graph:
                 print FormatGraph(year_string, book_count, page_count)
+                stat_line = '{:<4} {:>3} {:>3} {:>3} {:>3} {:>5} {:>3} {:>5}' 
             elif year_count == 0 and args.graph:
                 print('{:<65} {:>4} {:>5}'.format('Year', 'Books', 'Pages'))
+                stat_line = '{:<4} {:>3} {:>3} {:>3} {:>3} {:>5} {:>3} {:>5}'.format('Year', 'PB', 'EB', 'AB', 'TOT', 'PP', 'P/B', 'A/B')
             year_string = current_year + " "
             book_count = page_count = 0
             prev_year = current_year
@@ -119,6 +129,10 @@ for line in content:
             pp, audio = pages.split('/')
             pc = int(pp.replace('p', ''))
             page_count = page_count + int(pp.replace('p', ''))
+            hrs, mins = audio.split(':')
+            total_mins = int(hrs)*60 + int(mins)
+            audio_time = total_mins
+
         else:
             pc = int(pages.replace('p', ''))
             page_count = page_count + int(pages.replace('p', ''))
@@ -127,6 +141,7 @@ for line in content:
         book_count = book_count +1
         total_books = total_books + 1
         total_pages = total_pages + pc
+        total_audio_time = total_audio_time + audio_time
     else:
         print line
 f.close()
@@ -152,6 +167,8 @@ if args.stats:
     print "  - Paper:", total_paper
     print "  - Ebook:", total_ebook
     print "  - Audio:", total_audio
-    print "Avg books/year:", str(total_books/year_count)
-    print "Avg pages/year:", str(total_pages/year_count)
-    print "Avg pages/book:", str(total_pages/total_books)
+    print "Stats:"
+    print "  - Avg books/year:", str(total_books/year_count)
+    print "  - Avg pages/year:", str(total_pages/year_count)
+    print "  - Avg pages/book:", str(total_pages/total_books)
+    print "  - Avg audio time/book:", GetHoursMinsFormat(total_audio_time/total_audio/60.0)
