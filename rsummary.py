@@ -14,7 +14,7 @@ def GetHoursMinsFormat(hours):
 
 def FormatGraph(year_string, book_count, page_count):
     output = year_string
-    padding = 65 - (book_count + 5)
+    padding = 90 - (book_count + 5)
     output = output + " " * padding
     padding = 5 - len(str(book_count))
     output = output + " " * padding
@@ -41,7 +41,7 @@ parser.add_argument('-u', '--until_year', help='Summarize each year until yyyy i
 args = parser.parse_args()
 
 
-reading_list = expanduser("~") + "/Documents/reading-list/reading.md"
+reading_list = expanduser("~") + "/Documents/home/reading-list/reading.md"
 f=open(reading_list, 'r')
 content = f.readlines()
 stats = stat_line = ""
@@ -90,9 +90,9 @@ for line in content:
             #print len(year_string)
             if year_count != 0 and args.graph:
                 print FormatGraph(year_string, book_count, page_count)
-                stat_line = '{:<4} {:>3} {:>3} {:>3} {:>3} {:>5} {:>3} {:>5}' 
+                stat_line = '{:<4} {:>3} {:>3} {:>3} {:>3} {:>5} {:>3} {:>5}'
             elif year_count == 0 and args.graph:
-                print('{:<65} {:>4} {:>5}'.format('Year', 'Books', 'Pages'))
+                print('{:<90} {:>4} {:>5}'.format('Year', 'Books', 'Pages'))
                 stat_line = '{:<4} {:>3} {:>3} {:>3} {:>3} {:>5} {:>3} {:>5}'.format('Year', 'PB', 'EB', 'AB', 'TOT', 'PP', 'P/B', 'A/B')
             year_string = current_year + " "
             book_count = page_count = 0
@@ -149,10 +149,10 @@ f.close()
 if year_count != 0 and args.graph:
     print FormatGraph(year_string, book_count, page_count)
 elif year_count == 0 and args.graph:
-    print('{:<65} {:>4} {:>5}'.format('Year', 'Books', 'Pages'))
+    print('{:<90} {:>4} {:>6}'.format('Year', 'Books', 'Pages'))
 year_string = current_year + " "
 prev_year = current_year
-print('{:<65} {:>4} {:>6}'.format('Total', total_books, total_pages))
+print('{:<90} {:>4} {:>6}'.format('Total', total_books, total_pages))
 
 if args.legend:
     print ""
