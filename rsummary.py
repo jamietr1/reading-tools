@@ -14,7 +14,7 @@ def GetHoursMinsFormat(hours):
 
 def FormatGraph(year_string, book_count, page_count):
     output = year_string
-    padding = 90 - (book_count + 5)
+    padding = 100 - (book_count + 5)
     output = output + " " * padding
     padding = 5 - len(str(book_count))
     output = output + " " * padding
@@ -92,7 +92,7 @@ for line in content:
                 print FormatGraph(year_string, book_count, page_count)
                 stat_line = '{:<4} {:>3} {:>3} {:>3} {:>3} {:>5} {:>3} {:>5}'
             elif year_count == 0 and args.graph:
-                print('{:<90} {:>4} {:>5}'.format('Year', 'Books', 'Pages'))
+                print('{:<100} {:>4} {:>5}'.format('Year', 'Books', 'Pages'))
                 stat_line = '{:<4} {:>3} {:>3} {:>3} {:>3} {:>5} {:>3} {:>5}'.format('Year', 'PB', 'EB', 'AB', 'TOT', 'PP', 'P/B', 'A/B')
             year_string = current_year + " "
             book_count = page_count = 0
@@ -149,10 +149,10 @@ f.close()
 if year_count != 0 and args.graph:
     print FormatGraph(year_string, book_count, page_count)
 elif year_count == 0 and args.graph:
-    print('{:<90} {:>4} {:>6}'.format('Year', 'Books', 'Pages'))
+    print('{:<100} {:>4} {:>6}'.format('Year', 'Books', 'Pages'))
 year_string = current_year + " "
 prev_year = current_year
-print('{:<90} {:>4} {:>6}'.format('Total', total_books, total_pages))
+print('{:<100} {:>4} {:>6}'.format('Total', total_books, total_pages))
 
 if args.legend:
     print ""
@@ -171,4 +171,5 @@ if args.stats:
     print "  - Avg books/year:", str(total_books/year_count)
     print "  - Avg pages/year:", str(total_pages/year_count)
     print "  - Avg pages/book:", str(total_pages/total_books)
-    print "  - Avg audio time/book:", GetHoursMinsFormat(total_audio_time/total_audio/60.0)
+    if total_audio > 0:
+        print "  - Avg audio time/book:", GetHoursMinsFormat(total_audio_time/total_audio/60.0)
