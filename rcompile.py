@@ -2,11 +2,11 @@
 
 import re
 import argparse
-import fuzzy
+#import fuzzy
 from os.path import expanduser
 from datetime import datetime
 
-reading_list = expanduser("~") + "/Documents/reading-list/reading.md"
+reading_list = expanduser("~") + "/Documents/home/reading-list/reading.md"
 f=open(reading_list, 'r')
 content = f.readlines()
 authors = author_file = []
@@ -66,9 +66,9 @@ for author in authors:
     last_name = names[len(names)-1]
     del names[len(names)-1]
     first_name = " ".join(names)
-    soundex = fuzzy.Soundex(4)
-    sfirst = soundex(first_name)
-    slast = soundex(last_name)
+    soundex = '' #fuzzy.Soundex(4)
+    sfirst = '' #soundex(first_name)
+    slast = '' #soundex(last_name)
 
     # list of books
     f=open(reading_list, 'r')
@@ -88,17 +88,18 @@ for author in authors:
     author_file.append(last_name + "|" + first_name + '|' + author + '|' + slast + '|' + sfirst + '|' + book_list[:-1])
 
 # Write author index
-author_index = expanduser("~") + "/Scripts/reading-tools/authors.dat"
+author_index = expanduser("~") + "/Documents/scripts/reading-tools/data/authors.dat"
 auth = open(author_index, 'w')
 for author in sorted(author_file):
     print>>auth, author
 auth.close()
 
 # Build reading list index
-reading_list = expanduser("~") + "/Documents/reading-list/reading.md"
+reading_list = expanduser("~") + "/Documents/home/reading-list/reading.md"
 f=open(reading_list, 'r')
 content = f.readlines()
 reading_file = []
+book_count = 1
 
 for line in content:
     #print line
@@ -136,25 +137,26 @@ for line in content:
         date = datetime.strptime(matchObj.group(5), "%m/%d/%Y")
         date = datetime.strftime(date, "%Y-%m-%d")
 
-        reading_file.append(date + '|' + title_string + '|' + author + '|' + book_type + '|' + pages)
+        reading_file.append(str(book_count) + '|' + date + '|' + title_string + '|' + author + '|' + book_type + '|' + pages)
+    book_count = book_count +1
 f.close()
 
 # Write reading list index
-list_index = expanduser("~") + "/Scripts/reading-tools/reading.dat"
+list_index = expanduser("~") + "/Documents/scripts/reading-tools/data/reading.dat"
 reading = open(list_index, 'w')
 for item in reading_file:
     print>>reading, item
 reading.close()
 
 # Sort list by longest reading-tools
-list_index = expanduser("~") + "/Scripts/reading-tools/reading.dat"
+list_index = expanduser("~") + "/Documents/scripts/reading-tools/data/reading.dat"
 f=open(list_index, 'r')
 content = f.readlines()
 length_list = {}
 
 for line in content:
     line = line.rstrip()
-    date, title, author, media, pages = line.split('|')
+    num, date, title, author, media, pages = line.split('|')
     pages = int(pages)
     if pages in length_list.keys():
         value = length_list[pages]
@@ -165,7 +167,7 @@ for line in content:
 f.close()
 
 # Write reading length index
-list_index = expanduser("~") + "/Scripts/reading-tools/length.dat"
+list_index = expanduser("~") + "/Documents/scripts/reading-tools/data/length.dat"
 reading = open(list_index, 'w')
 for key in sorted(length_list.iterkeys(), reverse=True):
     print>>reading, length_list[key]
